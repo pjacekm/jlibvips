@@ -355,4 +355,13 @@ public class VipsImage {
     public SimilarityOperation similarity() {
         return new SimilarityOperation(this);
     }
+
+    /**
+     * When you are done with this image, use <code>unref()</code> to dispose of it.
+     *
+     * @see <a href="https://jcupitt.github.io/libvips/API/current/using-from-c.html">Reference counting</a>
+     */
+    public void unref() {
+        VipsBindingsSingleton.instance().g_object_unref(ptr);
+    }
 }

@@ -27,6 +27,9 @@ class VipsJoinOperationSpec extends Specification {
         then:
         image != null
         cleanup:
+        image1.unref()
+        image2.unref()
+        image.unref()
         Files.deleteIfExists if1
         Files.deleteIfExists if2
         where:
