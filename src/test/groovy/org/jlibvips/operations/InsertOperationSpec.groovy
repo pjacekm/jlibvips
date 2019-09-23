@@ -35,6 +35,8 @@ class InsertOperationSpec extends Specification {
         image.width == 2170
         image.height == 1330
         cleanup:
+        smallImage.unref()
+        baseImage.unref()
         Files.deleteIfExists baseImagePath
         Files.deleteIfExists smallImagePath
     }

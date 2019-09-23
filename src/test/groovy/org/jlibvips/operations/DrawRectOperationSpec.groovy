@@ -30,6 +30,7 @@ class DrawRectOperationSpec extends Specification {
         then:
         image.bands == 1
         cleanup:
+        image.unref()
         Files.deleteIfExists imagePath
     }
 
