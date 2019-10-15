@@ -41,6 +41,7 @@ public interface VipsBindings extends Library {
     int vips_merge(Pointer ref, Pointer sec, Pointer[] out, int direction, int dx, int dy, Object...args);
     int vips_rotate(Pointer in, Pointer[] out, double angle, Object...args);
     int vips_similarity(Pointer in, Pointer[] out, Object...args);
+    int vips_flatten(Pointer in, Pointer[] out, Object...args);
 
     /**
      * When you are done with an image, use <code>g_object_unref()</code> to dispose of it. If you pass an image to an

@@ -356,6 +356,10 @@ public class VipsImage {
         return new SimilarityOperation(this);
     }
 
+    public FlattenOperation flatten() {
+      return new FlattenOperation(this);
+    }
+
     /**
      * When you are done with this image, use <code>unref()</code> to dispose of it.
      *
