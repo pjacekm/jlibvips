@@ -94,6 +94,7 @@ class VipsImageSpec extends Specification {
         def image = VipsImage.fromFile(file)
         when: "calling .thumbnail()"
         def thumbnail = image.thumbnail(thumbnailWidth)
+                .height(100)
                 .autoRotate()
                 .size(VipsSize.Nearest)
                 .crop(VipsInteresting.Attention)
