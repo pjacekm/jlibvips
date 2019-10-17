@@ -3,15 +3,28 @@ package org.jlibvips;
 import com.sun.jna.Pointer;
 import org.jlibvips.exceptions.CouldNotLoadPdfVipsException;
 import org.jlibvips.exceptions.VipsException;
-import org.jlibvips.jna.VipsBindings;
 import org.jlibvips.jna.VipsBindingsSingleton;
 import org.jlibvips.jna.glib.GLibBindingsSingleton;
 import org.jlibvips.jna.glib.GLibLogHandler;
 import org.jlibvips.jna.glib.GLogLevelFlags;
-import org.jlibvips.operations.*;
+import org.jlibvips.operations.Composite2Operation;
+import org.jlibvips.operations.DeepZoomOperation;
+import org.jlibvips.operations.DrawRectOperation;
+import org.jlibvips.operations.FlattenOperation;
+import org.jlibvips.operations.JpegSaveOperation;
+import org.jlibvips.operations.SimilarityOperation;
+import org.jlibvips.operations.ThumbnailOperation;
+import org.jlibvips.operations.VipsEmbedOperation;
+import org.jlibvips.operations.VipsInsertOperation;
+import org.jlibvips.operations.VipsJoinOperation;
+import org.jlibvips.operations.VipsReduceOperation;
+import org.jlibvips.operations.VipsResizeOperation;
+import org.jlibvips.operations.VipsRotateOperation;
+import org.jlibvips.operations.VipsSaveOperation;
+import org.jlibvips.operations.WebpSaveOperation;
 
+import java.io.Closeable;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -25,7 +38,7 @@ import java.util.function.BiConsumer;
  *
  * @author amp
  */
-public class VipsImage {
+public class VipsImage implements Closeable {
 
     /**
      * This is the maximum resolution to which libvips can convert vectorised PDFs.
@@ -368,4 +381,9 @@ public class VipsImage {
     public void unref() {
         VipsBindingsSingleton.instance().g_object_unref(ptr);
     }
+
+  @Override
+  public void close() {
+      this.unref();
+  }
 }
