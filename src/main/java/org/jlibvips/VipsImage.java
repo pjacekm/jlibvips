@@ -55,12 +55,15 @@ public class VipsImage implements Closeable {
     public static VipsImage fromPdf(Path p, int page, float scale) {
         // Due to excessive testing we set 6 to be the maximum scale parameter and decrease by 0.1 until we reach a
         // scale working with the limit.
-        VipsImage image;
+        VipsImage image = null;
         do {
             Pointer[] ptr = new Pointer[1];
             int ret = VipsBindingsSingleton.instance().vips_pdfload(p.toString(), ptr, "scale", scale, "page", page, null);
             if(ret != 0) {
                 throw new CouldNotLoadPdfVipsException(ret);
+            }
+            if(image != null) {
+              image.unref();
             }
             image = new VipsImage(ptr[0]);
             scale -= 0.1f;
