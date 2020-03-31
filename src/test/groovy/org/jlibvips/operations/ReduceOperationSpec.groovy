@@ -32,6 +32,7 @@ class ReduceOperationSpec extends Specification {
         image.height == height
         image.width == width
         cleanup:
+        smallImage.unref()
         Files.deleteIfExists smallImagePath
     }
 

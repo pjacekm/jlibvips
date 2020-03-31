@@ -51,4 +51,14 @@ public interface VipsBindings extends Library {
 
     int vips_linear(Pointer in, Pointer[] out, Object a, Object b, int n, Object... args);
     int vips_bandjoin_const(Pointer in, Pointer[] out, double[] c, int n, Object... args);
+    int vips_flatten(Pointer in, Pointer[] out, Object...args);
+
+    /**
+     * When you are done with an image, use <code>g_object_unref()</code> to dispose of it. If you pass an image to an
+     * operation and that operation needs to keep a copy of the image, it will ref it. So you can unref an image as soon
+     * as you no longer need it, you don't need to hang on to it in case anyone else is still using it.
+     *
+     * @see <a href="https://developer.gnome.org/gobject/stable/gobject-The-Base-Object-Type.html#g-object-unref">g_object_unref()</a>
+     */
+    void g_object_unref(Pointer object);
 }

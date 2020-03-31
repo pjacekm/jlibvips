@@ -8,8 +8,22 @@ import org.jlibvips.jna.VipsBindingsSingleton;
 import org.jlibvips.jna.glib.GLibBindingsSingleton;
 import org.jlibvips.jna.glib.GLibLogHandler;
 import org.jlibvips.jna.glib.GLogLevelFlags;
-import org.jlibvips.operations.*;
 import org.jlibvips.util.VipsUtils;
+import org.jlibvips.operations.Composite2Operation;
+import org.jlibvips.operations.DeepZoomOperation;
+import org.jlibvips.operations.DrawRectOperation;
+import org.jlibvips.operations.FlattenOperation;
+import org.jlibvips.operations.JpegSaveOperation;
+import org.jlibvips.operations.SimilarityOperation;
+import org.jlibvips.operations.ThumbnailOperation;
+import org.jlibvips.operations.VipsEmbedOperation;
+import org.jlibvips.operations.VipsInsertOperation;
+import org.jlibvips.operations.VipsJoinOperation;
+import org.jlibvips.operations.VipsReduceOperation;
+import org.jlibvips.operations.VipsResizeOperation;
+import org.jlibvips.operations.VipsRotateOperation;
+import org.jlibvips.operations.VipsSaveOperation;
+import org.jlibvips.operations.WebpSaveOperation;
 
 import java.io.Closeable;
 import java.nio.file.Path;
@@ -26,7 +40,7 @@ import java.util.function.BiConsumer;
  *
  * @author amp
  */
-public class VipsImage {
+public class VipsImage implements Closeable {
 
     /**
      * This is the maximum resolution to which libvips can convert vectorised PDFs.
@@ -43,12 +57,15 @@ public class VipsImage {
     public static VipsImage fromPdf(Path p, int page, float scale) {
         // Due to excessive testing we set 6 to be the maximum scale parameter and decrease by 0.1 until we reach a
         // scale working with the limit.
-        VipsImage image;
+        VipsImage image = null;
         do {
             Pointer[] ptr = new Pointer[1];
             int ret = VipsBindingsSingleton.instance().vips_pdfload(p.toString(), ptr, "scale", scale, "page", page, null);
             if(ret != 0) {
                 throw new CouldNotLoadPdfVipsException(ret);
+            }
+            if(image != null) {
+              image.unref();
             }
             image = new VipsImage(ptr[0]);
             scale -= 0.1f;
@@ -455,4 +472,22 @@ public class VipsImage {
     public SimilarityOperation similarity() {
         return new SimilarityOperation(this);
     }
+
+    public FlattenOperation flatten() {
+      return new FlattenOperation(this);
+    }
+
+    /**
+     * When you are done with this image, use <code>unref()</code> to dispose of it.
+     *
+     * @see <a href="https://jcupitt.github.io/libvips/API/current/using-from-c.html">Reference counting</a>
+     */
+    public void unref() {
+        VipsBindingsSingleton.instance().g_object_unref(ptr);
+    }
+
+  @Override
+  public void close() {
+      this.unref();
+  }
 }

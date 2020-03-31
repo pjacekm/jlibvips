@@ -30,6 +30,9 @@ class Drawing extends Specification {
         then:
         newImage != null
         cleanup:
+        image.unref()
+        svgImage.unref()
+        newImage.unref()
         Files.deleteIfExists imagePath
     }
 

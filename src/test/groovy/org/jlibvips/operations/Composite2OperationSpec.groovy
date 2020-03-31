@@ -28,6 +28,8 @@ class Composite2OperationSpec extends Specification {
         then:
         println overlayedImage.jpeg().save()
         cleanup:
+        image.unref()
+        overlayedImage.unref()
         Files.deleteIfExists imagePath
         Files.deleteIfExists overlayPath
     }
