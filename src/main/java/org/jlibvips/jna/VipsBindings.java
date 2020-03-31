@@ -2,7 +2,6 @@ package org.jlibvips.jna;
 
 import com.sun.jna.Library;
 import com.sun.jna.Pointer;
-import org.jlibvips.VipsDirection;
 
 public interface VipsBindings extends Library {
 
@@ -41,4 +40,15 @@ public interface VipsBindings extends Library {
     int vips_merge(Pointer ref, Pointer sec, Pointer[] out, int direction, int dx, int dy, Object...args);
     int vips_rotate(Pointer in, Pointer[] out, double angle, Object...args);
     int vips_similarity(Pointer in, Pointer[] out, Object...args);
+    int vips_colourspace(Pointer in, Pointer[] out, Object space, Object... args);
+    boolean vips_colourspace_issupported(Pointer in);
+    int vips_bandand(Pointer in, Pointer[] out, Object... args);
+    int vips_ifthenelse(Pointer cond, Pointer in1, Pointer in2, Pointer[] out, Object... args);
+    Pointer vips_image_new_from_image(Pointer image, double[] c, int n);
+    int vips_maplut(Pointer in, Pointer[] out, Pointer lut, Object... args);
+    int vips_identity(Pointer[] out, Object... args);
+    int vips_relational_const(Pointer in, Pointer[] out, Object relational, double[] c, int n, Object... args);
+
+    int vips_linear(Pointer in, Pointer[] out, Object a, Object b, int n, Object... args);
+    int vips_bandjoin_const(Pointer in, Pointer[] out, double[] c, int n, Object... args);
 }

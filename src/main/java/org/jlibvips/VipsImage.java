@@ -9,9 +9,10 @@ import org.jlibvips.jna.glib.GLibBindingsSingleton;
 import org.jlibvips.jna.glib.GLibLogHandler;
 import org.jlibvips.jna.glib.GLogLevelFlags;
 import org.jlibvips.operations.*;
+import org.jlibvips.util.VipsUtils;
 
+import java.io.Closeable;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -100,6 +101,105 @@ public class VipsImage {
         byte[] buffer = string.getBytes();
         Pointer ptr = VipsBindingsSingleton.instance().vips_image_new_from_buffer(buffer, buffer.length, "");
         return new VipsImage(ptr);
+    }
+
+    /**
+     * Moves the image to target colorspace.
+     *
+     * @param space Target colour space
+     * @return New instance of {@link VipsImage} with that colorspace applied.
+     */
+    public VipsImage toColorspace(VipsInterpretation space) {
+        VipsBindings vips = VipsBindingsSingleton.instance();
+        if (!vips.vips_colourspace_issupported(this.ptr)) {
+            // This image doesn't support colourspace
+            return null;
+        }
+
+        Pointer[] out = new Pointer[1];
+        int ret = vips.vips_colourspace(this.ptr, out, space.value());
+        if (ret == -1) {
+            // Vips couldn't convert image successfully
+            return null;
+        }
+
+        return new VipsImage(out[0]);
+    }
+
+    private Pointer toNBands(int bands) {
+        int current = getBands();
+
+        if (current >= bands) return this.ptr;
+
+        VipsBindings vips = VipsBindingsSingleton.instance();
+
+        int len = bands - current;
+        double[] c = new double[len];
+        for (int i = 0; i < len; i++) c[i] = 255;
+
+        Pointer[] output = new Pointer[1];
+        int ret = vips.vips_bandjoin_const(this.ptr, output, c, len);
+        if (ret == -1) return null;
+        return output[0];
+    }
+
+    public VipsImage removeColor(long hex) {
+        VipsBindings vips = VipsBindingsSingleton.instance();
+        double[] rgba = VipsUtils.toRGA(hex);
+
+        Pointer base = toNBands(4);
+
+        Pointer[] preCond = new Pointer[1];
+        int retPreCond = vips.vips_relational_const(base, preCond, VipsUtils.toOrdinal(VipsOperationRelational.MOREEQ), rgba, 4);
+        if (retPreCond == -1)
+            return null;
+
+        Pointer[] cond = new Pointer[1];
+        int retCond = vips.vips_bandand(preCond[0], cond);
+        if (retCond == -1)
+            return null;
+
+        double[] transColor = new double[]{0.0, 0.0, 0.0, 0.0};
+        Pointer transp = vips.vips_image_new_from_image(this.ptr, transColor, 4);
+
+        Pointer[] out = new Pointer[1];
+        int ret = vips.vips_ifthenelse(cond[0], transp, base, out);
+        if (ret == -1)
+            return null;
+
+        return new VipsImage(out[0]);
+    }
+
+    public VipsImage tint(long hex) {
+        VipsBindings vips = VipsBindingsSingleton.instance();
+
+        double[] tint = VipsUtils.toRGA(hex);
+
+        Pointer[] identity = new Pointer[1];
+        int ret = vips.vips_identity(identity);
+        if (ret == -1)
+            return null;
+
+        // TODO: Needs to improve this
+        // When trying to apply tint in a PNG with transparency, the transparency goes to black,
+        // it should keep in transparent
+        Pointer lut[] = new Pointer[1];
+        ret = vips.vips_linear(
+                identity[0],
+                lut,
+                tint,
+                new double[0],
+                4);
+        if (ret == -1)
+            return null;
+
+
+        Pointer[] out2 = new Pointer[1];
+        ret = vips.vips_maplut(this.ptr, out2, lut[0]);
+        if (ret == -1)
+            return null;
+
+        return new VipsImage(out2[0]);
     }
 
   /**

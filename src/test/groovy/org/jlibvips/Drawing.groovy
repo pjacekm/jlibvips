@@ -1,6 +1,7 @@
 package org.jlibvips
 
 import org.jlibvips.jna.VipsBindingsSingleton
+import org.jlibvips.util.VipsUtils
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -32,4 +33,54 @@ class Drawing extends Specification {
         Files.deleteIfExists imagePath
     }
 
+    def "Convert colored image to b-w."() {
+        given:
+        def imagePath = copyResourceToFS "900x700.png"
+        def image = VipsImage.fromFile imagePath
+        when:
+        def bwImage = image.toColorspace(VipsInterpretation.B_W)
+        then:
+        bwImage != null
+        cleanup:
+        Files.deleteIfExists imagePath
+    }
+
+    def "Convert white to transparent."() {
+        given:
+        def imagePath = copyResourceToFS "900x700.png"
+        def image = VipsImage.fromFile imagePath
+        when:
+        def bwImage = image.removeColor(0xFFAAAAAA)
+        then:
+        bwImage != null
+        cleanup:
+        Files.deleteIfExists imagePath
+    }
+
+    def "Should tint."() {
+        given:
+        def imagePath = copyResourceToFS "fuel.png"
+        def image = VipsImage.fromFile imagePath
+        when:
+        def tinted = image
+            .toColorspace(VipsInterpretation.B_W)
+            .removeColor(0xFF999999)
+            .tint(0xFF00FF00)
+        then:
+        tinted != null
+        cleanup:
+        Files.deleteIfExists imagePath
+    }
+
+    def "Convert hexa to rgba."() {
+        given:
+        long hex = 0xFFABF790
+        when:
+        double[] rgba = VipsUtils.toRGA(hex)
+        then:
+        rgba[0] == 171
+        rgba[1] == 247
+        rgba[2] == 144
+        rgba[3] == 255
+    }
 }
