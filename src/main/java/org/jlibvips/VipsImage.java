@@ -8,22 +8,8 @@ import org.jlibvips.jna.VipsBindingsSingleton;
 import org.jlibvips.jna.glib.GLibBindingsSingleton;
 import org.jlibvips.jna.glib.GLibLogHandler;
 import org.jlibvips.jna.glib.GLogLevelFlags;
+import org.jlibvips.operations.*;
 import org.jlibvips.util.VipsUtils;
-import org.jlibvips.operations.Composite2Operation;
-import org.jlibvips.operations.DeepZoomOperation;
-import org.jlibvips.operations.DrawRectOperation;
-import org.jlibvips.operations.FlattenOperation;
-import org.jlibvips.operations.JpegSaveOperation;
-import org.jlibvips.operations.SimilarityOperation;
-import org.jlibvips.operations.ThumbnailOperation;
-import org.jlibvips.operations.VipsEmbedOperation;
-import org.jlibvips.operations.VipsInsertOperation;
-import org.jlibvips.operations.VipsJoinOperation;
-import org.jlibvips.operations.VipsReduceOperation;
-import org.jlibvips.operations.VipsResizeOperation;
-import org.jlibvips.operations.VipsRotateOperation;
-import org.jlibvips.operations.VipsSaveOperation;
-import org.jlibvips.operations.WebpSaveOperation;
 
 import java.io.Closeable;
 import java.nio.file.Path;
@@ -120,27 +106,13 @@ public class VipsImage implements Closeable {
         return new VipsImage(ptr);
     }
 
-    /**
-     * Moves the image to target colorspace.
-     *
-     * @param space Target colour space
-     * @return New instance of {@link VipsImage} with that colorspace applied.
-     */
-    public VipsImage toColorspace(VipsInterpretation space) {
-        VipsBindings vips = VipsBindingsSingleton.instance();
-        if (!vips.vips_colourspace_issupported(this.ptr)) {
-            // This image doesn't support colourspace
-            return null;
-        }
 
-        Pointer[] out = new Pointer[1];
-        int ret = vips.vips_colourspace(this.ptr, out, space.value());
-        if (ret == -1) {
-            // Vips couldn't convert image successfully
-            return null;
-        }
+    public ColorspaceOperation colorspace() {
+        return new ColorspaceOperation(this);
+    }
 
-        return new VipsImage(out[0]);
+    public BandJoinOperation bandjoin() {
+        return new BandJoinOperation(this);
     }
 
     private Pointer toNBands(int bands) {
@@ -148,21 +120,15 @@ public class VipsImage implements Closeable {
 
         if (current >= bands) return this.ptr;
 
-        VipsBindings vips = VipsBindingsSingleton.instance();
-
         int len = bands - current;
         double[] c = new double[len];
         for (int i = 0; i < len; i++) c[i] = 255;
 
-        Pointer[] output = new Pointer[1];
-        int ret = vips.vips_bandjoin_const(this.ptr, output, c, len);
-        if (ret == -1) return null;
-        return output[0];
+        return bandjoin().bandjoin_const(c).ptr;
     }
 
-    public VipsImage removeColor(long hex) {
+    public VipsImage removeColor(double[] rgba) {
         VipsBindings vips = VipsBindingsSingleton.instance();
-        double[] rgba = VipsUtils.toRGA(hex);
 
         Pointer base = toNBands(4);
 
@@ -176,7 +142,7 @@ public class VipsImage implements Closeable {
         if (retCond == -1)
             return null;
 
-        double[] transColor = new double[]{0.0, 0.0, 0.0, 0.0};
+        double[] transColor = new double[] {0, 0, 0, 0};
         Pointer transp = vips.vips_image_new_from_image(this.ptr, transColor, 4);
 
         Pointer[] out = new Pointer[1];
@@ -187,19 +153,14 @@ public class VipsImage implements Closeable {
         return new VipsImage(out[0]);
     }
 
-    public VipsImage tint(long hex) {
+    public VipsImage tint(double[] tint) {
         VipsBindings vips = VipsBindingsSingleton.instance();
-
-        double[] tint = VipsUtils.toRGA(hex);
 
         Pointer[] identity = new Pointer[1];
         int ret = vips.vips_identity(identity);
         if (ret == -1)
             return null;
 
-        // TODO: Needs to improve this
-        // When trying to apply tint in a PNG with transparency, the transparency goes to black,
-        // it should keep in transparent
         Pointer lut[] = new Pointer[1];
         ret = vips.vips_linear(
                 identity[0],

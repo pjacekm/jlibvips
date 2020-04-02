@@ -17,12 +17,4 @@ public class VipsUtils {
         return VipsBindingsSingleton.instance().vips_array_double_new(array, array.length);
     }
 
-    public static double[] toRGA(long hex) {
-        double[] rgba = new double[4];
-        rgba[3] = (hex & 0xFF000000) >> 24;
-        rgba[0] = (hex & 0xFF0000) >> 16;
-        rgba[1] = (hex & 0xFF00) >> 8;
-        rgba[2] = (hex & 0xFF);
-        return rgba;
-    }
 }
