@@ -78,7 +78,6 @@ class Drawing extends Specification {
             .tint(tint)
         then:
         tinted != null
-        println tinted.webp().save()
         cleanup:
         Files.deleteIfExists imagePath
     }

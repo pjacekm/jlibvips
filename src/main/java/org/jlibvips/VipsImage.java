@@ -298,6 +298,21 @@ public class VipsImage implements Closeable {
     }
 
     /**
+     * Write an image to a file in PNG format.
+     *
+     * <code>
+     *     java.nio.Path path = image.png().quality(100).save();
+     * </code>
+     *
+     * <a href="http://libvips.github.io/libvips/API/current/VipsForeignSave.html#vips-pngsave">vips_pngsave()</a>
+     *
+     * @return the {@link PngSaveOperation}
+     */
+    public PngSaveOperation png() {
+        return new PngSaveOperation(this);
+    }
+
+    /**
      * Get the width of this image.
      *
      * @return width in pixel
