@@ -11,10 +11,6 @@ import static org.jlibvips.TestUtils.copyResourceToFS
 
 class VipsRotateOperationSpec extends Specification {
 
-    def setupSpec() {
-        VipsBindingsSingleton.configure("libvips.42.dylib")
-    }
-
     def "Rotate a PNG by various angles."() {
         given:
         def file = copyResourceToFS "1920x1080.png"

@@ -1,8 +1,11 @@
 package org.jlibvips;
 
-public enum  VipsInterpretation {
+import java.util.Arrays;
+import java.util.Optional;
 
-    ERROR (1),
+public enum VipsInterpretation {
+
+    ERROR(1),
     MULTIBAND(0),
     B_W(1),
     HISTOGRAM(10),
@@ -32,6 +35,12 @@ public enum  VipsInterpretation {
 
     public int value() {
         return this.value;
+    }
+
+    static Optional<VipsInterpretation> fromValue(int value) {
+        return Arrays.stream(values())
+                .filter(i -> i.value == value)
+                .findAny();
     }
 
 }

@@ -49,10 +49,21 @@ public interface VipsBindings extends Library {
     int vips_maplut(Pointer in, Pointer[] out, Pointer lut, Object... args);
     int vips_identity(Pointer[] out, Object... args);
     int vips_relational_const(Pointer in, Pointer[] out, Object relational, double[] c, int n, Object... args);
+    int vips_relational_const1(Pointer in, Pointer[] out, Object relational, double c, Object... args);
+    int vips_black(Pointer[] out, Integer width, Integer height, Object...args);
 
-    int vips_linear(Pointer in, Pointer[] out, Object a, Object b, int n, Object... args);
+    int vips_linear(Pointer in, Pointer[] out, double[] a, double[] b, Integer n, Object... args);
+    int vips_linear1(Pointer in, Pointer[] out, double a, double b, Object... args);
     int vips_bandjoin_const(Pointer in, Pointer[] out, double[] c, int n, Object... args);
     int vips_flatten(Pointer in, Pointer[] out, Object...args);
+    int vips_cast(Pointer in, Pointer[] out, Object format, Object...args);
+    int vips_image_get_format(Pointer in);
+    int vips_image_get_interpretation(Pointer in);
+    double vips_image_get_xres(Pointer in);
+    double vips_image_get_yres(Pointer in);
+    int vips_image_get_xoffset(Pointer in);
+    int vips_image_get_yoffset(Pointer in);
+
 
     /**
      * When you are done with an image, use <code>g_object_unref()</code> to dispose of it. If you pass an image to an
@@ -62,4 +73,6 @@ public interface VipsBindings extends Library {
      * @see <a href="https://developer.gnome.org/gobject/stable/gobject-The-Base-Object-Type.html#g-object-unref">g_object_unref()</a>
      */
     void g_object_unref(Pointer object);
+
+    int vips_copy(Pointer in, Pointer[] out, Object...args);
 }
