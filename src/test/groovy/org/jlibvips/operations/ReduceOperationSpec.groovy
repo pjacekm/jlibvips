@@ -10,12 +10,6 @@ import static org.jlibvips.TestUtils.copyResourceToFS
 
 class ReduceOperationSpec extends Specification {
 
-    def setupSpec() {
-        VipsBindingsSingleton.configure("/usr/local/lib/libvips.so")
-// for MacOS
-// VipsBindingsSingleton.configure("/usr/local/lib/libvips.42.dylib")
-    }
-
     def "Should reduce a 500x500 JPEG into a 300x200 jpeg."() {
         given:
         def smallImagePath = copyResourceToFS("500x500.jpg")

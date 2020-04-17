@@ -9,10 +9,6 @@ import static TestUtils.*
 
 class VipsImageSpec extends Specification {
 
-    def setupSpec() {
-        VipsBindingsSingleton.configure("/usr/local/lib/libvips.so")
-    }
-
     def "get resolution of image"() {
         given: "a arbitrary image file"
         def file = copyResourceToFS(resource)

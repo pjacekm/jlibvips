@@ -10,10 +10,6 @@ import java.nio.file.Files
 
 class Composite2OperationSpec extends Specification {
 
-    def setupSpec() {
-        VipsBindingsSingleton.configure("/usr/local/lib/libvips.so")
-    }
-
     def "Draw PNG overlay onto JPEG."() {
         given: "A JPEG image and a PNG overlay"
         def imagePath = TestUtils.copyResourceToFS "snippet.jpg"

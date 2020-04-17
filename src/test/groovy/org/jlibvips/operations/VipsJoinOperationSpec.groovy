@@ -10,10 +10,6 @@ import java.nio.file.Files
 
 class VipsJoinOperationSpec extends Specification {
 
-    def setupSpec() {
-        VipsBindingsSingleton.configure("/usr/local/lib/libvips.so")
-    }
-
     def "Join images together."() {
         given:
         def if1 = TestUtils.copyResourceToFS(in1)
