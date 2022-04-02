@@ -18,6 +18,7 @@ public interface VipsBindings extends Library {
     int vips_dzsave(Pointer pointer, String outDir, Object...args);
 
     int vips_thumbnail_image(Pointer in, Pointer[] out, int width, Object...args);
+    int vips_thumbnail(String filename, Pointer[] out, int width, Object...args);
 
     Pointer vips_array_double_new(double[] array, int n);
 

@@ -41,6 +41,8 @@ public class VipsImage implements Closeable {
      */
     public static final int POPPLER_CAIRO_LIMIT = 32767;
 
+    private static Path path;
+
     public static VipsImage fromPdf(Path p, int page, float scale) {
         // Due to excessive testing we set 6 to be the maximum scale parameter and decrease by 0.1 until we reach a
         // scale working with the limit.
@@ -89,6 +91,7 @@ public class VipsImage implements Closeable {
      * @see <a href="http://libvips.github.io/libvips/API/current/VipsImage.html#vips-image-new-from-file">Native Function</a>
      */
     public static VipsImage fromFile(Path p) {
+        path=p;
         Pointer ptr = VipsBindingsSingleton.instance().vips_image_new_from_file(p.toString());
         return new VipsImage(ptr);
     }
@@ -293,6 +296,12 @@ public class VipsImage implements Closeable {
         return ptr;
     }
 
+
+    public Path getPath() {
+        return path;
+    }
+
+
     /**
      * Save an image as a set of tiles at various resolutions.
      *
@@ -326,6 +335,14 @@ public class VipsImage implements Closeable {
      */
     public ThumbnailOperation thumbnail(int width) {
         return new ThumbnailOperation(this, width);
+    }
+
+    /**
+     * @param width Fixed width in pixel of the new {@link VipsImage}
+     * @return the {@link ThumbnailFromFileOperation}
+     */
+    public ThumbnailFromFileOperation thumbnailFromFile(int width) {
+        return new ThumbnailFromFileOperation(this, width);
     }
 
     /**
